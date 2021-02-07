@@ -1,0 +1,280 @@
+###############################################################################
+#                                                                             #
+#             Scheduler Configuration File                                    #
+#               (c) Denodo Technologies                                       #
+#                                                                             #
+###############################################################################
+
+# Denodo Home
+user.dir=/opt/denodo
+
+# Server
+Launcher/url=scheduler
+Launcher/registryURL=localhost
+Launcher/registryPort=8000
+Launcher/shutdownPort=7999
+Launcher/factoryPort=7998
+Launcher/iconRoute=/opt/denodo/resources/scheduler/ico
+
+# Mail
+Mail/server=smtp
+Mail/port=25
+Mail/from=scheduler@denodo.com
+Mail/subject=Denodo Scheduler Notification
+Mail/testBody=This is an email from Denodo Scheduler to test the server configuration. If you have received this email, the configuration is ok. Note that if the subject contains variables, they will be replaced by their corresponding values at execution time.
+Mail/protocol=smtp
+Mail/tls=true
+Mail/trust=
+Mail/debug=false
+Mail/timeout=5000
+Mail/connectionTimeout=5000
+
+# Derby DataSource
+SchedulerDataSourceName=derby
+
+# JDBC DataSource
+ComplexDataSource/driverClassName=org.apache.derby.jdbc.EmbeddedDriver
+ComplexDataSource/url=jdbc:derby:schedulerDB
+ComplexDataSource/user=derby
+ComplexDataSource/password=R8+WWjmLdgBlxAxaTuw5Bw\=\=
+ComplexDataSource/databaseName=Derby
+
+PlainActionProcessor/className=com.denodo.scheduler.core.util.sql.SchedulerPlainActionProcessor
+
+# Entity Identifier Retriever
+EntityIdentifierRetrieverFactory/retrieverClassName=com.denodo.util.sql.GenericEntityIdentifierRetriever
+GenericEntityIdentifierRetriever/query=values IDENTITY_VAL_LOCAL()
+
+EntityIdentifierGeneratorFactory/generatorClassName=com.denodo.util.sql.SequenceNativeEntityIdentifierGenerator
+NativeEntityIdentifierGenerator/query=SELECT ?1.NEXTVAL FROM DUAL
+
+# Projects
+ProjectRepositoryFactory/className=com.denodo.scheduler.core.configuration.project.repository.ProjectRepositoryImpl
+ProjectManagerFactory/className=com.denodo.scheduler.core.configuration.project.ProjectManagerImpl
+
+# Metadata
+MetadataRepositoryFactory/className=com.denodo.configuration.metadata.repository.MetadataRepositoryImpl
+MetadataManager/className=com.denodo.configuration.metadata.manager.MetadataManagerImpl
+MetadataManagerImpl/applicationFolder=/opt/denodo/metadata/scheduler/elements
+MetadataManagerImpl/pluginsFolder=/opt/denodo/work/scheduler/plugins
+    
+# Configuration
+ConfigurationManagerFactory/className=com.denodo.scheduler.core.configuration.ConfigurationManagerImpl
+ConfigurationRepositoryFactory/className=com.denodo.scheduler.core.configuration.repository.ConfigurationRepositoryImpl
+ConfigurationLoader/applicationFolder=/opt/denodo/metadata/scheduler/data
+
+# Dependencies management
+DependenciesManagerFactory/className=com.denodo.scheduler.core.server.quartz.dependencies.DependenciesManagerImpl
+DependenciesRepositoryFactory/className=com.denodo.scheduler.core.server.quartz.dependencies.repository.NoDependenciesRepositoryImpl
+
+# Jobs Scheduler
+JobsSchedulerFactory/className=com.denodo.scheduler.core.server.quartz.QuartzJobsScheduler
+    
+# JDBC DataSource
+JDBCDriversManagerFactory/className=com.denodo.scheduler.core.jdbcdriver.JDBCDriversManagerImpl
+JDBCDriversRepositoryFactory/className=com.denodo.scheduler.core.jdbcdriver.repository.JDBCDriversRepositoryImpl
+JDBCDataSource/systemJdbcDriversDir=/opt/denodo/lib/extensions/jdbc-drivers
+JDBCDataSource/userJdbcDriversDir=/opt/denodo/work/scheduler/drivers
+
+# VDP DataSource
+vdpDataSource.userAgent=Denodo-Scheduler
+
+# CSV Datasource
+CSVDataSourceStorer/csvFolder=/opt/denodo/work/scheduler/csvFiles
+CSVDataSource/csvDefaultFolder=/opt/denodo
+
+# Content Extractor
+ExtractorFactory/extractor=pdf,doc,docx,xls,xlsx,ppt,pptx,html,xml,eml,default
+ExtractorFactory/extractor.pdf=com.denodo.scheduler.core.filterSequence.extractor.PDFExtractor
+ExtractorFactory/extractor.doc=com.denodo.scheduler.core.filterSequence.extractor.msoffice.WordExtractor
+ExtractorFactory/extractor.docx=com.denodo.scheduler.core.filterSequence.extractor.msoffice.WordXExtractor
+ExtractorFactory/extractor.xls=com.denodo.scheduler.core.filterSequence.extractor.msoffice.ExcelExtractor
+ExtractorFactory/extractor.xlsx=com.denodo.scheduler.core.filterSequence.extractor.msoffice.ExcelXExtractor
+ExtractorFactory/extractor.ppt=com.denodo.scheduler.core.filterSequence.extractor.msoffice.PowerPointExtractor
+ExtractorFactory/extractor.pptx=com.denodo.scheduler.core.filterSequence.extractor.msoffice.PowerPointXExtractor
+ExtractorFactory/extractor.html=com.denodo.scheduler.core.filterSequence.extractor.html.HTMLExtractor
+ExtractorFactory/extractor.xml=com.denodo.scheduler.core.filterSequence.extractor.XMLExtractor
+ExtractorFactory/extractor.eml=com.denodo.scheduler.core.filterSequence.extractor.MailExtractor
+ExtractorFactory/extractor.default=com.denodo.scheduler.core.filterSequence.extractor.PlainExtractor
+
+MailExtractor/workDirectory=/opt/denodo/work/scheduler/tmp/
+
+# Summary Generator Field
+SummaryGeneratorFilter/similarFields=description, summary
+
+# Title Generator Field
+TitleGeneratorFilter/similarFields=subject, title
+
+# Maximum number of concurrent opened files
+Exporters/maxOpenedFiles=50
+
+# CSV Exporter
+CSVExporter/filesPath=/opt/denodo/work/scheduler/data/csv
+
+#Log Errors
+LogErrorsConfig/filesPath=/opt/denodo/work/scheduler/data/log
+
+# FileRepository Path
+repositoryPath=/opt/denodo/work/scheduler/data/repository
+
+# JDBCExporter
+SQLPluginFactory/plugin.Oracle=com.denodo.scheduler.core.exporter.jdbc.OraclePlugin
+SQLPluginFactory/plugin.SQLServer=com.denodo.scheduler.core.exporter.jdbc.SQLServerPlugin
+SQLPluginFactory/plugin.ODBC=com.denodo.scheduler.core.exporter.jdbc.ODBCPlugin
+SQLPluginFactory/plugin.MySQL=com.denodo.scheduler.core.exporter.jdbc.MySQLPlugin
+SQLPluginFactory/plugin.PostgreSQL=com.denodo.scheduler.core.exporter.jdbc.PostgreSQLPlugin
+SQLPluginFactory/plugin.Excel=com.denodo.scheduler.core.exporter.jdbc.ExcelODBCPlugin
+SQLPluginFactory/plugin.Denodo=com.denodo.scheduler.core.exporter.jdbc.DenodoPlugin
+
+JDBCExporter/MaxConnectionErrors=5
+
+# SQL Exporter
+SQLExporter/sqlFilesPath=/opt/denodo/work/scheduler/data/sql
+
+# Document
+DocumentRepositoryFactory/className=com.denodo.scheduler.core.document.repository.DocumentRepositoryImpl
+DocumentManagerFactory/className=com.denodo.scheduler.core.document.DocumentManagerImpl
+
+# Chunk size for document processing
+documentChunkSize=200
+
+# Block size for sources
+Sources/BlockSize=10000
+
+# Thread pool for VDP and ITP jobs
+JobService/poolSize=20
+JobService/maxPoolSize=60
+JobService/keepAliveTime=0
+
+# Job Report
+JobReportRepositoryFactory/className=com.denodo.scheduler.core.job.report.repository.DerbyJobReportRepositoryImpl
+JobReportManagerFactory/className=com.denodo.scheduler.core.job.report.JobReportManagerImpl
+
+ReportsConfig/MaxErrorsToSave=50
+ReportsConfig/MaxIndividualJobReports=500
+# 50MB
+ReportsConfig/RecreateTable/MinEstimSpaceSaving=51200
+
+# Export-Import
+com.denodo.scheduler.core.tools.DataExporterImporter.workDirectory=/opt/denodo/work/scheduler/import-export
+
+#============================================================================
+# QUARTZ PROPERTIES
+#============================================================================
+
+# Configure Main Scheduler Properties  
+org.quartz.scheduler.instanceName=DenodoSched
+org.quartz.scheduler.instanceId=AUTO
+
+# Configure ThreadPool  
+org.quartz.threadPool.class=org.quartz.simpl.SimpleThreadPool
+org.quartz.threadPool.threadCount=20
+org.quartz.threadPool.threadPriority=5
+
+org.quartz.jobStore.misfireThreshold=60000
+
+# Configure JobStore  
+org.quartz.jobStore.class=org.quartz.impl.jdbcjobstore.JobStoreTX
+
+# Using PostgreSQLDelegate because EOFException is thrown with 
+# StdJDBCDelegate and CloudscapeDelegate getObjectFromBlob for jobs with 
+# no jobdata in Quartz 1.6.0
+org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+org.quartz.jobStore.useProperties=false
+org.quartz.jobStore.dataSource=quartzds
+org.quartz.jobStore.tablePrefix=QRTZ_
+
+# Configure clustering
+#org.quartz.jobStore.isClustered=true
+#org.quartz.jobStore.clusterCheckinInterval=20000
+
+# Configure DataSource  
+org.quartz.dataSource.quartzds.driver=org.apache.derby.jdbc.EmbeddedDriver
+org.quartz.dataSource.quartzds.URL=jdbc:derby:schedulerDB
+org.quartz.dataSource.quartzds.user=derby
+org.quartz.dataSource.quartzds.password=R8+WWjmLdgBlxAxaTuw5Bw\=\=
+org.quartz.dataSource.quartzds.maxConnections=6
+org.quartz.dataSource.quartzds.validationQuery=values(1)
+
+#============================================================================
+# Quartz Plugins
+#============================================================================
+# Dependencies
+org.quartz.plugin.dependenciesPlugin.class=com.denodo.scheduler.core.server.quartz.DependencySchedulerPlugin
+
+# Trigger history
+org.quartz.plugin.triggerHistory.class=com.denodo.scheduler.core.server.quartz.plugins.SchedulerLoggingTriggerHistoryPlugin
+org.quartz.plugin.triggerHistory.triggerFiredMessage=Trigger [{1}.{0}] fired job [{6}.{5}] at:{4, date, yyyy/MM/dd HH:mm:ss}. Job was scheduled at:{2, date, yyyy/MM/dd HH:mm:ss}. Next scheduled at:{3, date, yyyy/MM/dd HH:mm:ss}.
+org.quartz.plugin.triggerHistory.triggerCompleteMessage=Trigger [{1}.{0}] completed firing job [{6}.{5}] at{4, date, yyyy/MM/dd HH:mm:ss} with resulting trigger instruction code: {9}. Next scheduled at:{3, date, yyyy/MM/dd HH:mm:ss}. Re-fire count: {7}.
+org.quartz.plugin.triggerHistory.triggerMisfiredMessage=Trigger [{1}.{0}] misfired job [{6}.{5}] at:{4, date, yyyy/MM/dd HH:mm:ss}. Should have fired at:{3, date, yyyy/MM/dd HH:mm:ss}.
+
+# Shutdown
+org.quartz.plugin.shutdownhook.class=com.denodo.scheduler.core.server.quartz.plugins.SchedulerShutdownHookPlugin
+org.quartz.plugin.shutdownhook.cleanShutdown=false
+org.quartz.scheduler.interruptJobsOnShutdown=true
+
+org.quartz.scheduler.skipUpdateCheck=true
+
+###########################################################################
+#  Web container applications                                             #
+###########################################################################
+com.denodo.tomcat.webapps=webadmin/denodo-scheduler-admin
+
+
+###########################################################################
+#  i18n                                                                   #
+###########################################################################
+com.denodo.vdb.misc.I18nParametersManager.i18nDefault=$DENODO_LOCALE
+com.denodo.vdb.misc.I18nParametersManager.prefixFileName=i18n_
+com.denodo.vdb.misc.PropertiesMap.fileMapsPath.i18n=/opt/denodo/metadata/common/i18n/
+
+
+###########################################################################
+#  Java Security Parameters                                               #
+###########################################################################
+#com.denodo.security.ssl.enabled=
+#com.denodo.security.ssl.keyStore=
+#com.denodo.security.ssl.keyStorePassword=
+#com.denodo.security.ssl.trustStore=
+
+###########################################################################
+#  Permissions                                                            #
+###########################################################################
+PermissionsManagerFactory/className=com.denodo.scheduler.core.security.SchedulerPermissionsManager
+SchedPermissions/filePath=/opt/denodo/metadata/scheduler/security/permissions-config.xml
+PermissionsConfigurationManagerFactory/className=com.denodo.scheduler.core.security.PermissionsConfigurationManagerImpl
+PermissionsConfigurationRepositoryFactory/className=com.denodo.scheduler.core.security.repository.PermissionsConfigurationRepositoryImpl
+#if you change this name, you must also change it in shiro.ini
+PermissionsConfigurationManager/SchedulerRealmName=schedRealm
+
+VDPDataSource/host=localhost
+VDPDataSource/port=9999
+#VDPDataSource/database=admin
+
+###########################################################################
+#  ElasticSearch Exporter                                                 #
+###########################################################################
+com.denodo.scheduler.core.dataSource.connection.elasticsearchConnection.scrollingValue=60
+com.denodo.scheduler.core.dataSource.connection.elasticsearchConnection.resultsSizeValue=1000
+
+###########################################################################
+#  Kerberos options                                                       #
+###########################################################################
+com.denodo.vdb.security.KerberosAuthenticator.debug=false
+com.denodo.vdb.security.KerberosAuthenticator.kerberosConfigFile=
+com.denodo.vdb.security.KerberosAuthenticator.keyTab=
+com.denodo.vdb.security.KerberosAuthenticator.principal=
+com.denodo.vdb.security.KerberosAuthenticator.useKerberos=false
+
+###############################################################################
+# JVM options
+###############################################################################
+
+java.env.DENODO_OPTS_START=-mx1024m
+java.env.DENODO_OPTS_STOP=
+com.denodo.vdb.install=/opt/denodo
+SQLPluginFactory/plugin.Teradata=com.denodo.scheduler.core.exporter.jdbc.TeradataPlugin
+ComplexDataSource/password/encrypted=true
+org.quartz.dataSource.quartzds.password.encrypted=true
+#com.denodo.security.ssl.keyStorePassword.encrypted=
+#com.denodo.security.ssl.trustStorePassword.encrypted=

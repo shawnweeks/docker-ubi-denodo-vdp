@@ -1,0 +1,28 @@
+com.denodo.tomcat.home=/opt/denodo/resources/apache-tomcat
+com.denodo.tomcat.shutdown.port=9099
+com.denodo.tomcat.jmx.port=9098
+com.denodo.tomcat.jmx.rmi.host=localhost
+com.denodo.tomcat.jmx.rmi.port=9097
+com.denodo.tomcat.engine.name=DenodoPlatform-7.0
+com.denodo.tomcat.export.dirname=export
+com.denodo.tomcat.http.log=false
+{% if DENODO_SSL_ENABLED is defined and DENODO_SSL_ENABLED == 'true' %}
+com.denodo.security.ssl.enabled=true
+com.denodo.tomcat.https.port=9443
+com.denodo.security.ssl.keyStore={{ DENODO_SSL_KEYSTORE | default('') }}
+com.denodo.security.ssl.keyStorePassword={{ DENODO_SSL_KEYSTORE_PASSWORD | default('') }}
+# com.denodo.security.ssl.keyStorePassword.encrypted=
+{% if DENODO_SSL_TRUSTSTORE is defined %}
+com.denodo.security.ssl.trustStore={{ DENODO_SSL_TRUSTSTORE | default('') }}
+com.denodo.security.ssl.trustStorePassword={{ DENODO_SSL_TRUSTSTORE_PASSWORD | default('') }}
+# com.denodo.security.ssl.trustStorePassword.encrypted=
+{% endif %}
+{% else %}
+com.denodo.tomcat.http.port=9090
+{% endif %}
+java.env.DENODO_OPTS_START=-Xmx1024m -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true
+com.denodo.tomcat.jmx.auth.enabled=false
+com.denodo.tomcat.jmx.auth.access.file=/opt/denodo/resources/apache-tomcat/conf/jmxremote.access
+com.denodo.tomcat.jmx.auth.password.file=/opt/denodo/resources/apache-tomcat/conf/jmxremote.password
+com.denodo.vdp.host=localhost
+#com.denodo.security.management.jmxremote.ssl.config.file=/opt/denodo/resources/apache-tomcat/conf/jmxssl.properties
