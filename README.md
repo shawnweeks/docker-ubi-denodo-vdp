@@ -90,6 +90,13 @@ docker run --init -it --rm \
 | DENODO_SSL_KEYSTORE_PASSWORD | | None |
 | DENODO_SSL_TRUSTSTORE | | None |
 | DENODO_SSL_TRUSTSTORE_PASSWORD | | None |
+| START_VQL_SERVER | | true |
+| START_DESIGN_STUDIO | | true |
+| START_SCHEDULER | | true |
+| START_SCHEDULER_WEB_ADMIN | | true |
+| START_INDEXING_SERVER | | true |
+| START_DATA_CATALOG | | true |
+| START_DIAGNOSTIC_AND_MONITORING | | true |
 
 ### Virtual DataPort Default Ports
 | Server | Default Port |
