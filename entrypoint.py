@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 from entrypoint_helpers import env, gen_cfg, set_props
 

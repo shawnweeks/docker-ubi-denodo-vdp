@@ -7,6 +7,7 @@
 
 # Denodo Home
 user.dir=/opt/denodo
+com.denodo.vdb.install=/opt/denodo
 
 # Server
 Server/url=arnIndex
@@ -23,7 +24,7 @@ ARNIndexDataSourceName=derby
 ComplexDataSource/driverClassName=org.apache.derby.jdbc.EmbeddedDriver
 ComplexDataSource/url=jdbc:derby:arnIndexDB
 ComplexDataSource/user=derby
-ComplexDataSource/password=3w0iP0luEe7YAAoxoLkmXA\=\=
+ComplexDataSource/password=encrypted:FM7gSJ+g52qFXYeQONvMBeMKd8yfuuIEB9VGYkBN6zY40MCm/ihN+93sJ8tVMSLW8OD9Lk5y8jnphjrRCLRCth00dWsQ2aZOSmbJcWDbegC1VLAUjQmBtNsX1s5NoZBl
 
 #Configuration
 ConfigurationManagerFactory/className=com.denodo.arn.index.configuration.ConfigurationManagerImpl
@@ -56,15 +57,14 @@ LuceneHelper/minDocFreq=1
 #com.denodo.security.ssl.enabled=
 #com.denodo.security.ssl.keyStore=
 #com.denodo.security.ssl.keyStorePassword=
+#com.denodo.security.ssl.keyStorePassword.encrypted=
 #com.denodo.security.ssl.trustStore=
+#com.denodo.security.ssl.trustStorePassword=
+#com.denodo.security.ssl.trustStorePassword.encrypted=
 
 ###############################################################################
 # JVM options
 ###############################################################################
 
-java.env.DENODO_OPTS_START=-mx1024m
+java.env.DENODO_OPTS_START=-Xmx1024m
 java.env.DENODO_OPTS_STOP=
-com.denodo.vdb.install=/opt/denodo
-ComplexDataSource/password/encrypted=true
-#com.denodo.security.ssl.keyStorePassword.encrypted=
-#com.denodo.security.ssl.trustStorePassword.encrypted=

@@ -1,7 +1,7 @@
 ###############################################################################
 #                                                                             #
 #                     Virtual DataPort Configuration File                     #
-#                       (c) Denodo Technologies - 2018                        #
+#                       (c) Denodo Technologies - 2020                        #
 #                                                                             #
 ###############################################################################
 
@@ -10,16 +10,34 @@ com.denodo.vdb.install=/opt/denodo
 com.denodo.vdb.workDir=/opt/denodo/work/vdp
 com.denodo.vdb.jdbcDriversDir=/opt/denodo/extensions/thirdparty/lib
 com.denodo.vdb.jdbcDriversLibDir=/opt/denodo/lib/extensions/jdbc-drivers
-com.denodo.vdb.jdbcDriversExternalLibDir=/opt/denodo/lib-external/jdbc-drivers
+com.denodo.vdb.jdbcDriversExternalLibDir=/opt/denodo/lib/extensions/jdbc-drivers-external
+com.denodo.vdb.jdbcOtherDriversExternalLibDir=/opt/denodo/lib/extensions/jdbc-drivers-other
 com.denodo.vdb.jarsDir=/opt/denodo/metadata/db/jar
 
 # Server Configuration
-com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL={{ DENODO_HOSTNAME | default('localhost') }}
-com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryPort=9999
+# For restrict listening only from one ip or host (by default, 0.0.0.0)
+#com.denodo.vdb.vdbinterface.server.VDBManagerImpl.hostName=localhost
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.port=9999
 com.denodo.vdb.vdbinterface.server.VDBManagerImpl.shutdownPort=9998
-com.denodo.vdb.vdbinterface.server.VDBManagerImpl.factoryPort=9997
 com.denodo.vdb.vdbinterface.server.VDBManagerImpl.odbcPort=9996
+
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL={{ DENODO_HOSTNAME | default('localhost') }}
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryPort=9995
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.factoryPort=9997
 com.denodo.vdb.vdbinterface.server.VDBManagerImpl.iconRoute=/opt/denodo/resources/vdp/ico
+
+# RMI I/O, a value of 0 means a default value calculated depending on the CPU processors.
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.maxWorkers=0
+# RMI workers
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.rmiMinWorkers=4
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.rmiMaxWorkers=100
+# RMI workers TTL (seconds)
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.rmiWorkerTimeout=10
+
+# Refresh metadata period for environments sharing catalog database (seconds)
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.refreshMetadataPeriod = 60
+# Refresh mbeans period for environments sharing catalog database (seconds)
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.refreshMBeansPeriod = 0
 
 # Help files path
 com.denodo.vdb.interpreter.execution.Action.help.path=/com/denodo/vdb/interpreter/parser/help/
@@ -94,7 +112,7 @@ com.denodo.vdb.catalog.wrapper.MetaWrapper.jarDir=jar
 # JARS required by WS Wrappers
 com.denodo.vdb.catalog.wrapper.ws.MetaWebServiceWrapper.suntoolslibdir=/opt/denodo/lib/sun-tools
 com.denodo.vdb.catalog.wrapper.ws.MetaWebServiceWrapper.axislibdir=/opt/denodo/lib/contrib
-com.denodo.vdb.catalog.wrapper.ws.MetaWebServiceWrapper.axisjars=axis.jar,commons-discovery.jar,axis-jaxrpc.jar
+com.denodo.vdb.catalog.wrapper.ws.MetaWebServiceWrapper.axisjars=commons-discovery.jar,denodo-axis-jaxrpc.jar,denodo-axis-saaj.jar,denodo-axis-rt-core.jar,denodo-axis-rt-transport-jms.jar
 # Default Connection for HTML Wrapper
 com.denodo.parser.connection.html.ConnectionParser.defaultConnection=http.CommonsHttpClientConnection,120000
 com.denodo.vdb.misc.connection.util.ConnectionParser.defaultConnection=http.CommonsHttpClientConnection,120000
@@ -169,11 +187,8 @@ com.denodo.vdb.misc.datasource.JDBCDataSource.pool.pingQuery=
 # Enable or disable prepared statements pool. (true = enable)
 com.denodo.vdb.misc.datasource.JDBCDataSource.pool.poolPreparedStatements=false
 
-# The cap on the number of "sleeping" instances in each pool.
-com.denodo.vdb.misc.datasource.JDBCDataSource.pool.maxSleepingPreparedStatements=4
-
-# Default initial size for the prepared statements pool.
-com.denodo.vdb.misc.datasource.JDBCDataSource.pool.initialCapacityPreparedStatements=8
+# The maximum number of opened statements in each pool.
+com.denodo.vdb.misc.datasource.JDBCDataSource.pool.maxOpenPreparedStatements=-1
 
 # WS Connection Pool
 com.denodo.vdb.misc.datasource.WebServiceDataSource.connectionPoolTimeout=0
@@ -234,6 +249,13 @@ com.denodo.vdb.catalog.view.MetaSearchMethod.calculateViewPlans=true
 # If false, the execution plan is not sent to the client when an error happens.
 com.denodo.vdb.interpreter.execution.SelectAction.sendTraceOnError=true
 
+# Specifies if traces save execution times for each node. If not present, defaults to 'true'
+#com.denodo.vdb.interpreter.execution.SelectAction.saveTimesInTrace=false
+
+# Saving query traces in files and/or logs behavior. If not present, defaults to 'DISABLED'
+#com.denodo.vdb.interpreter.execution.saveTrace=ALL_FULL
+#com.denodo.vdb.interpreter.execution.saveTraceDir=/opt/denodo/logs/vdp/trace
+
 # Maximum size in MB of a queue of rows in an intermediate result
 com.denodo.vdb.engine.RowQueueSizeInMB=10
 
@@ -272,8 +294,7 @@ com.denodo.vdb.cache.AbstractViewCacheManager.instanceClassName=com.denodo.vdb.c
 com.denodo.vdb.cache.cacheStatus=OFF
 
 # Cache DataSource Name
-com.denodo.vdb.cache.jdbc.cacheDataSourceName=vdpcachedatasource
-com.denodo.vdb.cache.jdbc.cacheDatabaseDataSourceName=admin
+com.denodo.vdb.cache.jdbc.serverCacheDataSource="admin"."vdpcachedatasource"
 com.denodo.vdb.cache.jdbc.customCacheDataSourceName=customvdpcachedatasource
 
 # Memory Cache Class for Caching View Objects
@@ -289,13 +310,16 @@ com.denodo.vdb.cache.ViewCacheManager.cacheMaintainerTaskPeriod=240
 com.denodo.vdb.engine.wrapper.raw.jdbc.batchInsertSize=200
 com.denodo.vdb.engine.wrapper.raw.jdbc.netezza.batchInsertSize=10000
 com.denodo.vdb.engine.wrapper.raw.jdbc.sqlserver.batchInsertSize=1000
+com.denodo.vdb.engine.wrapper.raw.jdbc.teradata.batchInsertSize=1000
 com.denodo.vdb.engine.wrapper.raw.jdbc.redshift.batchInsertSize=50000
 
+com.denodo.vdb.engine.wrapper.raw.jdbc.athena.bulkLoad.batchInsertSize=500000
 com.denodo.vdb.engine.wrapper.raw.jdbc.redshift.bulkLoad.batchInsertSize=500000
 com.denodo.vdb.engine.wrapper.raw.jdbc.snowflake.bulkLoad.batchInsertSize=500000
 com.denodo.vdb.engine.wrapper.raw.jdbc.impala.bulkLoad.batchInsertSize=5000000
 com.denodo.vdb.engine.wrapper.raw.jdbc.hive.bulkLoad.batchInsertSize=5000000
 com.denodo.vdb.engine.wrapper.raw.jdbc.spark.bulkLoad.batchInsertSize=5000000
+com.denodo.vdb.engine.wrapper.raw.jdbc.teradata.bulkLoad.batchInsertSize=1000
 com.denodo.vdb.engine.wrapper.raw.jdbc.presto.bulkLoad.batchInsertSize=5000000
 
 # Number of rows that are fetched from the database when more rows are needed. 
@@ -327,8 +351,6 @@ com.denodo.vdb.engine.resource.queryMemoryLimit=200
 #  ODBC Configuration Parameters                                              #
 ###############################################################################
 
-# I18n for ODBC adapter
-com.denodo.vdb.vdbinterface.server.odbc.i18nCode=us_utc_iso
 # Data buffer size for ODBC queries
 com.denodo.vdb.vdbinterface.server.odbc.dataBufferSize=1048576
 # Chunk size for ODBC connections
@@ -357,7 +379,7 @@ com.denodo.vdb.http.userAgent=
 #  Web Services Generator Configuration Parameters                            #
 ###############################################################################
 # Web Container
-com.denodo.tomcat.webapps=export,denodo-restfulws,denodo-odata4-service
+com.denodo.tomcat.webapps=sso,denodo-restfulws,denodo-odata4-service,denodo-graphql-service
 com.denodo.webcontainer.startonstartup=on
 
 # WSGenerator working Directory.
@@ -366,7 +388,7 @@ com.denodo.wsgenerator.workDir=/opt/denodo/work/vdp
 # Parameters needed by wsdl2java
 com.denodo.vdb.wsgenerator.common.suntoolslibdir=/opt/denodo/lib/sun-tools
 com.denodo.vdb.wsgenerator.common.axislibdir=/opt/denodo/lib/contrib
-com.denodo.vdb.wsgenerator.common.axisjars=axis.jar,commons-discovery.jar,axis-jaxrpc.jar
+com.denodo.vdb.wsgenerator.common.axisjars=denodo-axis-rt-core.jar,commons-discovery.jar,denodo-axis-jaxrpc.jar,denodo-axis-saaj.jar,denodo-axis-rt-transport-jms.jar
 
 # Base lib directory
 com.denodo.vdb.wsgenerator.common.baselibdir=/opt/denodo/lib
@@ -375,8 +397,8 @@ com.denodo.vdb.wsgenerator.common.baselibdir=/opt/denodo/lib
 com.denodo.vdb.wsgenerator.common.compilationjars=contrib/commons-logging.jar,contrib/denodo-commons-interpolator.jar,contrib/log4j-api.jar,contrib/log4j-core.jar,contrib/wss4j.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/commons-betwixt.jar,contrib/commons-beanutils.jar,vdp-client-core/denodo-vdp-client.jar,../resources/apache-tomcat/lib/servlet-api.jar
 
 # Jars needed for war creation
-com.denodo.vdb.wsgenerator.common.warjars=contrib/opensaml-core.jar,contrib/opensaml-saml-api.jar,contrib/opensaml-saml-impl.jar,contrib/java-support.jar,contrib/metrics-core.jar,contrib/Saxon-HE.jar,contrib/denodo-commons-interpolator.jar,contrib/log4j-api.jar,contrib/log4j-core.jar,contrib/wss4j.jar,contrib/xmlsec.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/axis.jar,contrib/commons-discovery.jar,contrib/commons-betwixt.jar,contrib/commons-beanutils.jar,contrib/commons-digester.jar,contrib/axis-jaxrpc.jar,contrib/commons-collections.jar,contrib/commons-collections4.jar,contrib/commons-logging.jar,contrib/commons-lang.jar,contrib/java_cup_runtime.jar,contrib/commons-pool.jar,contrib/wsdl4j.jar,contrib/denodo-commons-util-web.jar,vdp-client-core/denodo-vdp-client.jar,contrib/commons-codec.jar,contrib/icu4j.jar,contrib/jms.jar,contrib/stax.jar,contrib/jackson-core.jar,contrib/jackson-databind.jar
-com.denodo.vdb.wsgenerator.common.tomcatjars=contrib/axis.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/wss4j.jar
+com.denodo.vdb.wsgenerator.common.warjars=contrib/opensaml-core.jar,contrib/opensaml-saml-api.jar,contrib/opensaml-saml-impl.jar,contrib/java-support.jar,contrib/metrics-core.jar,contrib/Saxon-HE.jar,contrib/denodo-commons-interpolator.jar,contrib/log4j-api.jar,contrib/log4j-core.jar,contrib/denodo-wss4j.jar,contrib/xmlsec.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,,contrib/denodo-axis-saaj.jar,contrib/denodo-axis-jaxrpc.jar,contrib/denodo-axis-rt-core.jar,contrib/denodo-axis-rt-transport-jms.jar,contrib/commons-discovery.jar,contrib/commons-betwixt.jar,contrib/commons-beanutils.jar,contrib/commons-digester.jar,contrib/commons-collections.jar,contrib/commons-collections4.jar,contrib/commons-logging.jar,contrib/commons-lang.jar,contrib/commons-lang3.jar,contrib/java_cup_runtime.jar,contrib/commons-pool2.jar,contrib/wsdl4j.jar,ws-contrib/denodo-commons-util-web.jar,vdp-client-core/denodo-vdp-client.jar,contrib/denodo-asyncrmi.jar,contrib/commons-codec.jar,contrib/icu4j.jar,contrib/jms.jar,contrib/stax.jar,contrib/jackson-core.jar,contrib/jackson-databind.jar,contrib/istack-commons-runtime.jar,contrib/jaxb-runtime.jar,contrib/jaxb-api.jar,/ws-contrib/javax.activation-api.jar,contrib/javax.xml.soap-api.jar
+com.denodo.vdb.wsgenerator.common.tomcatjars=contrib/denodo-axis-jaxrpc.jar,contrib/denodo-axis-rt-core.jar,contrib/denodo-axis-rt-transport-jms.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/denodo-wss4j.jar
 com.denodo.vdb.wsgenerator.common.resourcesdir=/opt/denodo/resources/db/wsgenerator
 com.denodo.vdb.wsgenerator.common.log4j2file=log4j2.xml
 com.denodo.vdb.wsgenerator.common.cssfile=default.css
@@ -406,7 +428,7 @@ com.denodo.wsgenerator.widget.portlet.editmodeenabled=true
 com.denodo.wsgenerator.widget.portlet.cache.expirationtime=30
 com.denodo.wsgenerator.widget.portlet.cache.scope=PRIVATE
 #com.denodo.wsgenerator.widget.portlet.cache.scope=PRIVATE
-com.denodo.wsgenerator.widget.portlet.portletjars=contrib/denodo-commons-interpolator.jar,portlet-client-core/denodo-vdp-wsgenerator-portlet-client.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/commons-discovery.jar,contrib/commons-betwixt.jar,contrib/commons-beanutils.jar,contrib/commons-digester.jar,contrib/commons-collections.jar,contrib/commons-collections4.jar,contrib/commons-logging.jar,contrib/commons-lang.jar,contrib/java_cup_runtime.jar,contrib/commons-pool.jar,contrib/denodo-commons-util-web.jar,vdp-client-core/denodo-vdp-client.jar,contrib/log4j-api.jar,contrib/log4j-core.jar,contrib/jstl-api.jar,contrib/taglibs-standard-impl.jar,contrib/taglibs-standard-jstlel.jar,contrib/commons-codec.jar,contrib/icu4j.jar,contrib/stax.jar
+com.denodo.wsgenerator.widget.portlet.portletjars=contrib/denodo-commons-interpolator.jar,portlet-client-core/denodo-vdp-wsgenerator-portlet-client.jar,contrib/denodo-vdp-wsgenerator-runtime.jar,contrib/commons-discovery.jar,contrib/commons-betwixt.jar,contrib/commons-beanutils.jar,contrib/commons-digester.jar,contrib/commons-collections.jar,contrib/commons-collections4.jar,contrib/commons-logging.jar,contrib/commons-lang.jar,contrib/commons-lang3.jar,contrib/java_cup_runtime.jar,contrib/commons-pool2.jar,ws-contrib/denodo-commons-util-web.jar,vdp-client-core/denodo-vdp-client.jar,contrib/log4j-api.jar,contrib/log4j-core.jar,contrib/jstl-api.jar,contrib/taglibs-standard-impl.jar,contrib/taglibs-standard-jstlel.jar,contrib/commons-codec.jar,contrib/icu4j.jar,contrib/stax.jar
 com.denodo.wsgenerator.widget.webpartdir=/opt/denodo/resources/db/wsgenerator/widget/webpart
 
 ###############################################################################
@@ -419,6 +441,9 @@ com.denodo.security.ssl.keyStorePassword={{ DENODO_SSL_KEYSTORE_PASSWORD | defau
 #com.denodo.security.ssl.keyStorePassword.encrypted=
 {% if DENODO_SSL_TRUSTSTORE is defined %}
 com.denodo.security.ssl.trustStore={{ DENODO_SSL_TRUSTSTORE | default('') }}
+
+# "changeit" is the default password for the "cacerts" TrustStore included in 
+# the Java Runtime Environment
 com.denodo.security.ssl.trustStorePassword={{ DENODO_SSL_TRUSTSTORE_PASSWORD | default('') }}
 #com.denodo.security.ssl.trustStorePassword.encrypted=
 {% endif %}
@@ -455,8 +480,8 @@ TokenMarca/visibleTags=SELECT,IMG,MAP,BUTTON,TEXTAREA,INPUT
 
 ### Parameters to locate remote pool from IEBrowserConnection
 ### (if it is nos specified, default local pool is created) ###
-IEBrowserConnection.POOL_HOST=%{SERVERPOOL_HOST}
-IEBrowserConnection.POOL_PORT=%{SERVERPOOL_PORT}
+IEBrowserConnection.POOL_HOST=localhost
+IEBrowserConnection.POOL_PORT=6001
 IEBrowserConnection.POOL_NAME=RemoteIEBrowserPoolImpl
 IEBrowserConnection.charsetName=UTF-8
 
@@ -497,6 +522,11 @@ com.denodo.itp.admin.custom.components.dir=/opt/denodo/metadata/itp-custom-compo
 
 # Temp directory
 ITPilot.tempDirectory=/opt/denodo/temp
+
+com.denodo.vdb.engine.wrapper.raw.html.ItpAccessFactory.jars=lib/iebrowser-core/denodo-iebrowser.jar,lib/itp-runtime/js.jar,lib/itp-runtime/denodo-itpmodel-runtime.jar,lib/itp-contrib/denodo-itpcore.jar,lib/denodo-vdp-adapters/denodo-itp-adapter/denodo-vdp-itp-adapter.jar
+com.denodo.iebrowser.connection.http.DenodoBrowserPoolConnection.jars=lib/iebrowser-core/denodo-iebrowser.jar,lib/itp-runtime/js.jar
+com.denodo.itp.component.core.evaluator.custom.ScriptRunner.jars=lib/iebrowser-core/denodo-iebrowser.jar,lib/itp-runtime/js.jar,lib/itp-contrib/denodo-itpcore.jar,extensions/thirdparty/itp-lib
+com.denodo.util.net.ProxyUtil.jars=lib/itp-runtime/js.jar,lib/contrib/denodo-commons-util.jar
 
 ###############################################################################
 #  ITPilot Converters                                                         #
@@ -552,7 +582,7 @@ com.denodo.vdb.misc.datasource.LDAPDataSource.pool.connectionTimeout=30000
 com.denodo.vdb.misc.datasource.LDAPDataSource.pool.minEvictableIdleTimeMillis=1800000
 
 ###############################################################################
-#  DF - Maximum characters per line                                                                                   #
+#  DF - Maximum characters per line										      #
 ###############################################################################
 com.denodo.vdb.engine.wrapper.raw.df.row.maxlen=512000
 
@@ -577,7 +607,7 @@ com.denodo.vdb.misc.datasource.OLAPDataSource.pool.pingQuery=
 #  JVM options                                                                #
 ###############################################################################
 
-java.env.DENODO_OPTS_START=-mx1024m -XX\:NewRatio=4
+java.env.DENODO_OPTS_START=-Xmx4096m -XX:+DisableExplicitGC -XX:+UseG1GC -XX:ReservedCodeCacheSize=256m
 java.env.DENODO_OPTS_STOP=
 
 ###############################################################################
@@ -657,10 +687,10 @@ com.denodo.vdb.engine.costoptimizer.multiBlockReadCount=8
 com.denodo.vdb.engine.costoptimizer.transferRateFactor=1.0
 # Default readRate in I/O operations/millisecond
 com.denodo.vdb.engine.costoptimizer.readRate=1
-# Default initTime in millisencods
+# Default initTime in milliseconds
 com.denodo.vdb.engine.costoptimizer.initTime=5
 
-# Parameter initTime by data source type in millisencods
+# Parameter initTime by data source type in milliseconds
 com.denodo.vdb.engine.costoptimizer.initTime.ws=10
 com.denodo.vdb.engine.costoptimizer.initTime.xml=10
 com.denodo.vdb.engine.costoptimizer.initTime.json=10
@@ -719,9 +749,6 @@ com.denodo.vdb.engine.costoptimizer.numCPUsPerProcessingUnit.jdbc.presto.default
 
 ###############################################################################
 
-# ARN block size
-com.denodo.vdb.engine.wrapper.raw.arn.blockSize=2000
-
 ## SAPBW BAPI POOL
 com.denodo.vdb.misc.datasource.SAPBWBapiDataSource.pool.maxWait=60000
 com.denodo.vdb.misc.datasource.SAPBWBapiDataSource.pool.maxActive=20
@@ -738,6 +765,11 @@ com.denodo.vdb.misc.datasource.SAPERPDataSource.pool.maxActive=20
 com.denodo.vdb.misc.datasource.SAPERPDataSource.pool.maxIdle=4
 com.denodo.vdb.misc.datasource.SAPERPDataSource.pool.minEvictableIdleTimeMillis=100000
 com.denodo.vdb.misc.datasource.SAPERPDataSource.pool.timeBetweenEvictionRunsMillis=150000
+
+## Salesforce BULK API parameters
+com.denodo.vdb.misc.datasource.SalesforceDataSource.bulk.batchStatus.maxWaitMillis=1800000
+com.denodo.vdb.misc.datasource.SalesforceDataSource.bulk.batchStatus.timeBetweenRequestsMillis=2000
+
 
 ## MDB cache levels enabling
 com.denodo.vdb.engine.wrapper.raw.mdb.uniquenames.cache.enable=true
@@ -759,7 +791,8 @@ com.denodo.vdb.engine.session.restriction.ResourceManagerEngine.maintainerPeriod
 
 # FILE privilege accesible routes (disabled, * or a list of routes delimited by | )
 com.denodo.security.file.privilege.generalaccess=*
-com.denodo.util.net.ProxyUtil.jars=lib/itp-runtime/js.jar,lib/contrib/denodo-commons-util.jar
-com.denodo.vdb.engine.wrapper.raw.jdbc.athena.bulkLoad.batchInsertSize=500000
-com.denodo.vdb.engine.wrapper.raw.jdbc.teradata.batchInsertSize=1000
-com.denodo.vdb.engine.wrapper.raw.jdbc.teradata.bulkLoad.batchInsertSize=1000
+com.denodo.vdb.interpreter.execution.SelectAction.simplify=true
+com.denodo.vdb.interpreter.execution.SelectAction.summaryRewrite=true
+com.denodo.vdb.interpreter.execution.SelectAction.dataMovement=true
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.runtimeRegistryPort=9999
+com.denodo.vdb.vdbinterface.server.VDBManagerImpl.runtimeShutdownPort=9998

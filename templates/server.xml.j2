@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -14,79 +14,105 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---><Server port="${com.denodo.tomcat.shutdown.port}" shutdown="SHUTDOWN">
-    <Listener className="org.apache.catalina.startup.VersionLoggerListener"/>
-    <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
-    <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
-    <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+-->
+<!-- Note:  A "Server" is not itself a "Container", so you may not
+     define subcomponents such as "Valves" at this level.
+     Documentation at /docs/config/server.html
+ -->
+<Server port="${com.denodo.tomcat.shutdown.port}" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <!-- Security listener. Documentation at /docs/config/listeners.html
+  <Listener className="org.apache.catalina.security.SecurityListener" />
+  -->
+  <!--APR library loader. Documentation at /docs/apr.html -->
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <!-- Prevent memory leaks due to use of particular java/javax APIs-->
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
 
-    <!-- Global JNDI resources -->
+  <!-- Global JNDI resources
+       Documentation at /docs/jndi-resources-howto.html
+  -->
     <GlobalNamingResources>
-
         <!-- Editable user database that can also be used by
              UserDatabaseRealm to authenticate users
         -->
-        <Resource auth="Container" description="User database that can be updated and saved" factory="org.apache.catalina.users.MemoryUserDatabaseFactory" name="UserDatabase" pathname="conf/tomcat-users.xml" type="org.apache.catalina.UserDatabase"/>
-
-        <!-- Virtual DataPort Data source required by the Denodo OData Service -->
-        
-
+        <Resource name="UserDatabase" auth="Container"
+                  type="org.apache.catalina.UserDatabase"
+                  description="User database that can be updated and saved"
+                  factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                  pathname="conf/tomcat-users.xml" />
     </GlobalNamingResources>
 
     <!-- Define the Tomcat Stand-Alone Service -->
     <Service name="${com.denodo.tomcat.engine.name}">
 
-        
+
 
         {% if DENODO_SSL_ENABLED is defined and DENODO_SSL_ENABLED == 'true' %}
-        <!-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 -->        
-        <Connector port="${com.denodo.tomcat.https.port}"
-                   maxHttpHeaderSize="8192"
-                   maxThreads="150"
-                   minSpareThreads="25"
-                   scheme="https"
-                   secure="true"
-                   SSLEnabled="true"
-                   protocols="TLSv1.2"
-                   honorCipherOrder="true"
-                   sendReasonPhrase="true"
-                   keystoreFile="${com.denodo.security.ssl.keyStore}" 
-                   keystorePass ="${com.denodo.security.ssl.keyStorePassword}"/>
+        <!-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 -->
+        <Connector
+            port="${com.denodo.tomcat.https.port}"
+            protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+            maxHttpHeaderSize="8192"
+            maxThreads="150"
+            scheme="https"
+            secure="true"
+            SSLEnabled="true"
+            compression="on"
+            compressionMinSize="1024"
+            noCompressionUserAgents="gozilla, traviata"
+            compressableMimeType="text/html,text/xml,application/json,application/xml,text/css,text/javascript,application/javascript">
+            <SSLHostConfig
+                protocols="+TLSv1.2,+TLSv1.3"
+                honorCipherOrder="true">
+                <Certificate
+                    certificateKeystoreFile="${com.denodo.security.ssl.keyStore}"
+                    certificateKeystorePassword="${com.denodo.security.ssl.keyStorePassword}" />
+            </SSLHostConfig>
+        </Connector>
         {% else %}
         <!-- Define a non-SSL HTTP/1.1 Connector -->
-        <Connector URIEncoding="UTF-8"
-                   connectionTimeout="20000"
+        <Connector port="${com.denodo.tomcat.http.port}"
+                   protocol="HTTP/1.1"
                    maxThreads="150" 
-                   minSpareThreads="25" 
-                   port="${com.denodo.tomcat.http.port}" 
-                   redirectPort="${com.denodo.tomcat.https.port}" 
-                   relaxedQueryChars="[]" 
-                   sendReasonPhrase="true"/>
+                   minSpareThreads="25"
+                   redirectPort="${com.denodo.tomcat.https.port}"
+                   connectionTimeout="20000"
+                   URIEncoding="UTF-8"
+                   compression="on"
+                   compressionMinSize="1024"
+                   noCompressionUserAgents="gozilla, traviata"
+                   compressableMimeType="text/html,text/xml,application/json,application/xml,text/css,text/javascript,application/javascript" />
         {% endif %}
 
         <!-- Define the top level container in our container hierarchy -->
-        <Engine defaultHost="localhost" name="${com.denodo.tomcat.engine.name}">
+        <Engine name="${com.denodo.tomcat.engine.name}" defaultHost="localhost">
 
             <!-- Use the LockOutRealm to prevent attempts to guess user passwords
                  via a brute-force attack -->
             <Realm className="org.apache.catalina.realm.LockOutRealm">
-
                 <!-- This Realm uses the UserDatabase configured in the global JNDI
                      resources under the key "UserDatabase".  Any edits
                      that are performed against this UserDatabase are immediately
                      available for use by the Realm.  -->
-                <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
+                <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+                       resourceName="UserDatabase"/>
             </Realm>
 
-            <Host autoDeploy="false" deployOnStartup="false" name="localhost" unpackWARs="true">
+            <Host name="localhost"
+                  unpackWARs="true" autoDeploy="false" deployOnStartup="false">
 
                 <!--
                 <Valve className="org.apache.catalina.valves.AccessLogValve"
                        directory="../../logs/apache-tomcat"  prefix="http_access." suffix=".log"
                pattern="common" resolveHosts="false"/>
                 -->
-                <Context className="org.apache.catalina.core.StandardContext" docBase="ROOT" path="" wrapperClass="org.apache.catalina.core.StandardWrapper">
-                </Context>
+                
+                <Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />
+
+                <Context path="" docBase="ROOT" wrapperClass="org.apache.catalina.core.StandardWrapper" />
 
             </Host>
         </Engine>

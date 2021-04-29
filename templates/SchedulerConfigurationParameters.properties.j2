@@ -7,6 +7,7 @@
 
 # Denodo Home
 user.dir=/opt/denodo
+com.denodo.vdb.install=/opt/denodo
 
 # Server
 Launcher/url=scheduler
@@ -36,7 +37,7 @@ SchedulerDataSourceName=derby
 ComplexDataSource/driverClassName=org.apache.derby.jdbc.EmbeddedDriver
 ComplexDataSource/url=jdbc:derby:schedulerDB
 ComplexDataSource/user=derby
-ComplexDataSource/password=R8+WWjmLdgBlxAxaTuw5Bw\=\=
+ComplexDataSource/password=encrypted:FM7gSJ+g52qFXYeQONvMBeMKd8yfuuIEB9VGYkBN6zY40MCm/ihN+93sJ8tVMSLW8OD9Lk5y8jnphjrRCLRCth00dWsQ2aZOSmbJcWDbegC1VLAUjQmBtNsX1s5NoZBl
 ComplexDataSource/databaseName=Derby
 
 PlainActionProcessor/className=com.denodo.scheduler.core.util.sql.SchedulerPlainActionProcessor
@@ -54,8 +55,12 @@ ProjectManagerFactory/className=com.denodo.scheduler.core.configuration.project.
 
 # Metadata
 MetadataRepositoryFactory/className=com.denodo.configuration.metadata.repository.MetadataRepositoryImpl
-MetadataManager/className=com.denodo.configuration.metadata.manager.MetadataManagerImpl
+MetadataManager/className=com.denodo.scheduler.core.metadata.impl.SchedulerMetadataManagerImpl
 MetadataManagerImpl/applicationFolder=/opt/denodo/metadata/scheduler/elements
+
+# Plugins
+PluginsManagerFactory/className=com.denodo.scheduler.core.plugin.PluginsManagerImpl
+PluginsRepositoryFactory/className=com.denodo.scheduler.core.plugin.repository.PluginsRepositoryImpl
 MetadataManagerImpl/pluginsFolder=/opt/denodo/work/scheduler/plugins
     
 # Configuration
@@ -125,6 +130,7 @@ SQLPluginFactory/plugin.MySQL=com.denodo.scheduler.core.exporter.jdbc.MySQLPlugi
 SQLPluginFactory/plugin.PostgreSQL=com.denodo.scheduler.core.exporter.jdbc.PostgreSQLPlugin
 SQLPluginFactory/plugin.Excel=com.denodo.scheduler.core.exporter.jdbc.ExcelODBCPlugin
 SQLPluginFactory/plugin.Denodo=com.denodo.scheduler.core.exporter.jdbc.DenodoPlugin
+SQLPluginFactory/plugin.Teradata=com.denodo.scheduler.core.exporter.jdbc.TeradataPlugin
 
 JDBCExporter/MaxConnectionErrors=5
 
@@ -146,17 +152,26 @@ JobService/poolSize=20
 JobService/maxPoolSize=60
 JobService/keepAliveTime=0
 
+# Timeout for jobs waiting in the thread pool's queue
+com.denodo.scheduler.core.job.pool.TimedItemBlockingQueue.MAX_ENQUEUED_TIMEOUT=10000
+com.denodo.scheduler.core.job.pool.TimedItemBlockingQueue.TimeoutMaintenanceThread.SLEEP_TIME=5000
+
 # Job Report
 JobReportRepositoryFactory/className=com.denodo.scheduler.core.job.report.repository.DerbyJobReportRepositoryImpl
 JobReportManagerFactory/className=com.denodo.scheduler.core.job.report.JobReportManagerImpl
 
 ReportsConfig/MaxErrorsToSave=50
-ReportsConfig/MaxIndividualJobReports=500
+ReportsConfig/MaxIndividualJobReports=100
 # 50MB
 ReportsConfig/RecreateTable/MinEstimSpaceSaving=51200
 
 # Export-Import
 com.denodo.scheduler.core.tools.DataExporterImporter.workDirectory=/opt/denodo/work/scheduler/import-export
+
+# Kerberos settings
+KerberosSettingsManagerFactory/className=com.denodo.scheduler.core.kerberossettings.KerberosSettingsManagerImpl
+KerberosSettingsRepositoryFactory/className=com.denodo.scheduler.core.kerberossettings.repository.KerberosSettingsRepositoryImpl
+KerberosSettings/kerberosFilesPath=/opt/denodo/work/scheduler/kerberos
 
 #============================================================================
 # QUARTZ PROPERTIES
@@ -192,7 +207,7 @@ org.quartz.jobStore.tablePrefix=QRTZ_
 org.quartz.dataSource.quartzds.driver=org.apache.derby.jdbc.EmbeddedDriver
 org.quartz.dataSource.quartzds.URL=jdbc:derby:schedulerDB
 org.quartz.dataSource.quartzds.user=derby
-org.quartz.dataSource.quartzds.password=R8+WWjmLdgBlxAxaTuw5Bw\=\=
+org.quartz.dataSource.quartzds.password=encrypted:FM7gSJ+g52qFXYeQONvMBeMKd8yfuuIEB9VGYkBN6zY40MCm/ihN+93sJ8tVMSLW8OD9Lk5y8jnphjrRCLRCth00dWsQ2aZOSmbJcWDbegC1VLAUjQmBtNsX1s5NoZBl
 org.quartz.dataSource.quartzds.maxConnections=6
 org.quartz.dataSource.quartzds.validationQuery=values(1)
 
@@ -236,6 +251,7 @@ com.denodo.vdb.misc.PropertiesMap.fileMapsPath.i18n=/opt/denodo/metadata/common/
 #com.denodo.security.ssl.keyStore=
 #com.denodo.security.ssl.keyStorePassword=
 #com.denodo.security.ssl.trustStore=
+#com.denodo.security.ssl.trustStorePassword=
 
 ###########################################################################
 #  Permissions                                                            #
@@ -247,9 +263,21 @@ PermissionsConfigurationRepositoryFactory/className=com.denodo.scheduler.core.se
 #if you change this name, you must also change it in shiro.ini
 PermissionsConfigurationManager/SchedulerRealmName=schedRealm
 
-VDPDataSource/host=localhost
-VDPDataSource/port=9999
+###########################################################################
+#  VDP Data Source for Authentication                                     #
+###########################################################################
+#VDPDataSource/host=localhost
+#VDPDataSource/port=$VDP_PORT
 #VDPDataSource/database=admin
+
+###########################################################################
+#  Settings Manager                                                       #
+###########################################################################
+com.denodo.sch.vdp.host=localhost
+com.denodo.sch.vdp.port=9999
+
+SettingsManagerFactory/className=com.denodo.scheduler.core.settings.SettingsManagerImpl
+SettingsRepositoryFactory/className=com.denodo.scheduler.core.settings.repository.SettingsRepositoryImpl
 
 ###########################################################################
 #  ElasticSearch Exporter                                                 #
@@ -266,15 +294,10 @@ com.denodo.vdb.security.KerberosAuthenticator.keyTab=
 com.denodo.vdb.security.KerberosAuthenticator.principal=
 com.denodo.vdb.security.KerberosAuthenticator.useKerberos=false
 
+
 ###############################################################################
 # JVM options
 ###############################################################################
 
-java.env.DENODO_OPTS_START=-mx1024m
+java.env.DENODO_OPTS_START=-Xmx1024m
 java.env.DENODO_OPTS_STOP=
-com.denodo.vdb.install=/opt/denodo
-SQLPluginFactory/plugin.Teradata=com.denodo.scheduler.core.exporter.jdbc.TeradataPlugin
-ComplexDataSource/password/encrypted=true
-org.quartz.dataSource.quartzds.password.encrypted=true
-#com.denodo.security.ssl.keyStorePassword.encrypted=
-#com.denodo.security.ssl.trustStorePassword.encrypted=
