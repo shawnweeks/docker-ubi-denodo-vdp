@@ -94,6 +94,16 @@ entrypoint.py
 
 ${HOME}/bin/regenerateFiles.sh
 
+if [[ "${USE_EXTERNAL_METADATA,,}" == 'true' ]]; then
+    echo Regenerating metadata from database
+    if [[ -f "${EXT_META_DB_PROP_FILE}" ]]; then
+        ${HOME}/bin/regenerateMetadata.sh --file ${EXT_META_DB_PROP_FILE} -y
+    else
+        echo "External metadata database properties file '${EXT_META_DB_PROP_FILE}' not found"
+        exit 1
+    fi
+fi
+
 trap "shutdown" INT TERM
 
 unset "${!DENODO_@}"

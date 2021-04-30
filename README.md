@@ -97,6 +97,8 @@ docker run --init -it --rm \
 | START_INDEXING_SERVER | | true |
 | START_DATA_CATALOG | | true |
 | START_DIAGNOSTIC_AND_MONITORING | | true |
+| USE_EXTERNAL_METADATA | Enables the use of an external database for storage of metadata. This will run the regenerateMetadata.sh script with the database connection properties file declared in $EXT_META_DB_PROP_FILE. | false |
+| EXT_META_DB_PROP_FILE | Metadata database connection properties file path. | /opt/denodo/conf/metadb.properties |
 
 ### Virtual DataPort Default Ports
 | Server | Default Port |

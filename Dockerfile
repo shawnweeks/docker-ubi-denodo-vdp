@@ -39,6 +39,8 @@ COPY --chown=${DENODO_USER}:${DENODO_GROUP} [ "entrypoint.sh", "entrypoint.py", 
 COPY [ "templates/*.j2", "/opt/jinja-templates/" ]
 RUN chmod 755 ${DENODO_HOME}/entrypoint.*
 
+ENV EXT_META_DB_PROP_FILE=${DENODO_HOME}/conf/metadb.properties
+
 ENV START_VQL_SERVER=true
 ENV START_DESIGN_STUDIO=true
 ENV START_SCHEDULER=true
@@ -46,6 +48,7 @@ ENV START_SCHEDULER_WEB_ADMIN=true
 ENV START_INDEXING_SERVER=true
 ENV START_DATA_CATALOG=true
 ENV START_DIAGNOSTIC_AND_MONITORING=true
+ENV USE_EXTERNAL_METADATA=false
 
 VOLUME ${DENODO_HOME}/metadata/db
 
