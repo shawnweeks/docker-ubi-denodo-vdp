@@ -90,15 +90,29 @@ docker run --init -it --rm \
 | DENODO_SSL_KEYSTORE_PASSWORD | | None |
 | DENODO_SSL_TRUSTSTORE | | None |
 | DENODO_SSL_TRUSTSTORE_PASSWORD | | None |
-| START_VQL_SERVER | | true |
-| START_DESIGN_STUDIO | | true |
-| START_SCHEDULER | | true |
-| START_SCHEDULER_WEB_ADMIN | | true |
-| START_INDEXING_SERVER | | true |
-| START_DATA_CATALOG | | true |
-| START_DIAGNOSTIC_AND_MONITORING | | true |
-| USE_EXTERNAL_METADATA | Enables the use of an external database for storage of metadata. This will run the regenerateMetadata.sh script with the database connection properties file declared in $EXT_META_DB_PROP_FILE. | false |
-| EXT_META_DB_PROP_FILE | Metadata database connection properties file path. | /opt/denodo/conf/metadb.properties |
+| DENODO_START_VQL_SERVER | | true |
+| DENODO_START_DESIGN_STUDIO | | true |
+| DENODO_START_SCHEDULER | | true |
+| DENODO_START_SCHEDULER_WEB_ADMIN | | true |
+| DENODO_START_INDEXING_SERVER | | true |
+| DENODO_START_DATA_CATALOG | | true |
+| DENODO_START_DIAGNOSTIC_AND_MONITORING | | true |
+| DENODO_USE_EXTERNAL_METADATA | Enables the use of an external database for storage of metadata. | false |
+| DENODO_STORAGE_CATALOG | | |
+| DENODO_STORAGE_DATASOURCE_TESTONBORROW | | true |
+| DENODO_STORAGE_DATASOURCE_MAXACTIVE | | 100 |
+| DENODO_STORAGE_PLUGIN | | postgresql |
+| DENODO_STORAGE_ENCRYPTEDPASSWORD | The Denodo encrypted password. This is currently being generated from DENODO_STORAGE_PASSWORD | |
+| DENODO_STORAGE_PASSWORD | Plain-text password. Will be encrypted by Denodo. | |
+| DENODO_STORAGE_SHAREDMETADATA | | true |
+| DENODO_STORAGE_CLASSPATH | | postgresql-10 |
+| DENODO_STORAGE_URI | | jdbc\:postgresql\://postgres\:5432/denodo |
+| DENODO_STORAGE_DATASOURCE_INITIALSIZE | | 4 |
+| DENODO_STORAGE_DATASOURCE_VALIDATIONQUERY | | Select 1 |
+| DENODO_STORAGE_USER | | denodo |
+| DENODO_STORAGE_DRIVER | | org.postgresql.Driver |
+| DENODO_STORAGE_VERSION | | 10 |
+| DENODO_STORAGE_SCHEMA | | |
 
 ### Virtual DataPort Default Ports
 | Server | Default Port |

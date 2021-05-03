@@ -3,6 +3,20 @@
 set -e
 umask 0027
 
+START_VQL_SERVER="$DENODO_START_VQL_SERVER"
+START_DESIGN_STUDIO="$DENODO_START_DESIGN_STUDIO"
+START_SCHEDULER="$DENODO_START_SCHEDULER"
+START_SCHEDULER_WEB_ADMIN="$DENODO_START_SCHEDULER_WEB_ADMIN"
+START_INDEXING_SERVER="$DENODO_START_INDEXING_SERVER"
+START_DATA_CATALOG="$DENODO_START_DATA_CATALOG"
+START_DIAGNOSTIC_AND_MONITORING="$DENODO_START_DIAGNOSTIC_AND_MONITORING"
+
+if [[ "${START_VQL_SERVER,,}" == 'true' || "${START_DESIGN_STUDIO,,}" == 'true' || "${START_SCHEDULER_WEB_ADMIN,,}" == 'true' || "${START_DATA_CATALOG,,}" == 'true' || "${START_DIAGNOSTIC_AND_MONITORING,,}" == 'true' ]]; then
+    WEB_CONTAINER_RUNNING='true'
+else
+    WEB_CONTAINER_RUNNING='false'
+fi
+
 monitor() {
     while true
     do
@@ -12,7 +26,7 @@ monitor() {
         if [[ "${START_VQL_SERVER,,}" == 'true' && "$PS_OUTPUT" != *'Denodo VDP Server 8.0'* ]]; then
             echo "VQL Server not Running - Exiting Now"
             shutdown 1
-        elif [[ ("${START_VQL_SERVER,,}" == 'true' || "${START_DESIGN_STUDIO,,}" == 'true' || "${START_SCHEDULER_WEB_ADMIN,,}" == 'true' || "${START_DATA_CATALOG,,}" == 'true' || "${START_DIAGNOSTIC_AND_MONITORING,,}" == 'true') && "$PS_OUTPUT" != *'Denodo Web Container 8.0'* ]]; then
+        elif [[ "${WEB_CONTAINER_RUNNING,,}" == 'true' && "$PS_OUTPUT" != *'Denodo Web Container 8.0'* ]]; then
             echo "Other services not running - Exiting Now"
             shutdown 1
         elif [[ "${START_SCHEDULER,,}" == 'true' && "$PS_OUTPUT" != *'Denodo Scheduler Server 8.0'* ]]; then
@@ -90,16 +104,20 @@ shutdown() {
     exit ${1:-0}
 }
 
+if [[ "${DENODO_USE_EXTERNAL_METADATA,,}" == 'true' && -n "$DENODO_STORAGE_PASSWORD" ]]; then
+    export DENODO_STORAGE_ENCRYPTEDPASSWORD="$(${HOME}/bin/encrypt_password.sh $DENODO_STORAGE_PASSWORD | grep 'Encrypted Password:' -v)"
+fi
+
 entrypoint.py
 
 ${HOME}/bin/regenerateFiles.sh
 
-if [[ "${USE_EXTERNAL_METADATA,,}" == 'true' ]]; then
+if [[ "${DENODO_USE_EXTERNAL_METADATA,,}" == 'true' ]]; then
     echo Regenerating metadata from database
-    if [[ -f "${EXT_META_DB_PROP_FILE}" ]]; then
-        ${HOME}/bin/regenerateMetadata.sh --file ${EXT_META_DB_PROP_FILE} -y
+    if [[ -f "${DENODO_EXT_META_DB_PROP_FILE}" ]]; then
+        ${HOME}/bin/regenerateMetadata.sh --file ${DENODO_EXT_META_DB_PROP_FILE} -y
     else
-        echo "External metadata database properties file '${EXT_META_DB_PROP_FILE}' not found"
+        echo "External metadata database properties file '${DENODO_EXT_META_DB_PROP_FILE}' not found"
         exit 1
     fi
 fi
