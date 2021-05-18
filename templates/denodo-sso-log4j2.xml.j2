@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+  <Appenders>
+
+    <RollingFile name="FILEOUT" filePattern="{{ HOME }}/logs/denodo-sso/sso-%d{yyyy-MM-dd}.log">
+      <Policies>
+	    <TimeBasedTriggeringPolicy />
+      </Policies>
+      <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+    </RollingFile>
+   
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+    </Console>
+
+
+  </Appenders>
+
+  <Loggers>
+
+    <Logger name="com.denodo" level="error" />
+
+    <Logger name="com.denodo.webapp.security.sso" level="warn" />
+    <Logger name="com.denodo.webapp.security.sso.DenodoSSOWebApplication" level="info" />
+
+    <Root level="error">
+      <AppenderRef ref="FILEOUT" />
+    </Root>
+
+  </Loggers>
+
+</Configuration>

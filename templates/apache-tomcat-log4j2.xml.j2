@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+
+    <Appenders>
+
+        <RollingFile name="TOMCAT" filePattern="{{ HOME }}/logs/apache-tomcat/tomcat-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+		
+		<RollingFile name="DENODOWS" filePattern="{{ HOME }}/logs/apache-tomcat/denodows-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %X{remote_host} %X{remote_user} &quot;%X{request_verb} %X{request_url}&quot; %c - %m%n" />
+        </RollingFile>
+		
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="com.denodo" level="WARN" additivity="false">
+			<AppenderRef ref="DENODOWS" />
+		</Logger>
+		
+		<Logger name="org.apache.catalina" level="INFO" />
+
+        <Root level="ERROR">
+            <AppenderRef ref="TOMCAT" />
+        </Root>
+
+    </Loggers>
+
+</Configuration>

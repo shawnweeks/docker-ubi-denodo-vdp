@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+    <Appenders>
+
+        <RollingFile name="FILEOUT" filePattern="{{ HOME }}{% raw %}/logs/vdp-dmt/vdp-dmt-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c{1} %x - %enc{%m}  %n" />
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="com.denodo" level="ERROR" />
+
+        <Root level="ERROR">
+            <AppenderRef ref="FILEOUT" />
+        </Root>
+
+    </Loggers>
+
+</Configuration>
+{% endraw %}

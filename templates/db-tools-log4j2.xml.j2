@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+
+    <Appenders>
+
+        <RollingFile name="DBTOOLSOUT" filePattern="{{ HOME }}/logs/db-tools-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+		
+        <RollingFile name="REQUESTOUT" filePattern="{{ HOME }}/logs/vdp-requests-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+
+		<Logger name="com.denodo.vdb.vdbinterface.client.tools.QueryLogger" level="INFO" additivity="false">
+			<AppenderRef ref="REQUESTOUT" />
+		</Logger>
+
+        <Root level="ERROR">
+            <AppenderRef ref="DBTOOLSOUT" />
+        </Root>
+
+    </Loggers>
+
+</Configuration>

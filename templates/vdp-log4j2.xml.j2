@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+
+  <Appenders>
+
+    <RollingFile name="FILEOUT" filePattern="{{ HOME }}/logs/vdp/vdp-%d{yyyy-MM-dd}.log">
+      <Policies>
+	    <TimeBasedTriggeringPolicy />
+      </Policies>
+      <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+    </RollingFile>
+
+    <RollingFile name="REQUESTOUT" filePattern="{{ HOME }}/logs/vdp/vdp-requests-%d{yyyy-MM-dd}.log">
+      <Policies>
+	    <TimeBasedTriggeringPolicy />
+      </Policies>
+      <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+    </RollingFile>
+
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+    </Console>
+
+    <RollingFile name="CACHEOUT" filePattern="{{ HOME }}/logs/vdp/vdp-cache-%d{yyyy-MM-dd}.log">
+      <Policies>
+	    <TimeBasedTriggeringPolicy />
+      </Policies>
+      <PatternLayout pattern="%-4r [%t] %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %x -\t%m  %n" />
+    </RollingFile>
+
+    <RollingFile name="QUERIESOUT" filePattern="{{ HOME }}/logs/vdp/vdp-queries-%d{yyyy-MM-dd}.log">
+      <Policies>
+	    <TimeBasedTriggeringPolicy />
+      </Policies>
+      <PatternLayout pattern="%-4r [%t] %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %x -\t%m  %n" />
+    </RollingFile>
+
+  </Appenders>
+
+  <Loggers>
+
+    <Logger name="com.denodo" level="error" />
+
+    <Logger name="com.denodo.vdp.resourcemanager" level="error" />
+
+    <Logger name="com.denodo.solutionmanager" level="error" />
+
+    <Logger name="com.denodo.tomcat" level="info" />
+
+    <Logger name="org.apache.commons.betwixt" level="error" />
+
+    <Logger name="org.apache.commons" level="error" />
+
+    <Logger name="org.enhydra.jdbc.xapool" level="fatal" />
+
+    <Logger name="com.google.api.client.http.HttpTransport" level="fatal" />
+
+    <Logger name="com.microsoft.tfs" level="error" />
+
+    <Logger name="com.denodo.vdp.derby" level="error" />
+
+    <Logger name="com.denodo.vdp.requests" level="error" additivity="false">
+      <AppenderRef ref="REQUESTOUT" />
+    </Logger>
+
+    <Logger name="com.denodo.vdb.engine.ResultCache" level="error" additivity="false">
+      <AppenderRef ref="CACHEOUT" />
+    </Logger>
+
+    <Logger name="com.denodo.vdb.management.mbeans.request.RequestsManagementInfo" level="error" additivity="false">
+      <AppenderRef ref="QUERIESOUT" />
+    </Logger>
+
+    <Root level="error">
+      <AppenderRef ref="FILEOUT" />
+    </Root>
+
+  </Loggers>
+
+</Configuration>
