@@ -1,7 +1,6 @@
 ### Build Command
 ```shell
 docker build \
-    --progress plain \
     -t ${REGISTRY}/denodo/vdp:8.0 \
     --build-arg BASE_REGISTRY=${REGISTRY} \
     .
@@ -31,8 +30,8 @@ docker run --init -it --rm \
     -p 9999:9999 \
     -p 10091:10091 \
     --add-host='denodo.example.org:127.0.0.1' \
-    -e DENODO_LICENSE_SERVER=denodo-solman \
-    -e DENODO_HOSTNAME=denodo.example.org \
+    -e DENODO_LICENSE_HOSTNAME=denodo-solman \
+    -e DENODO_RMI_HOSTNAME=denodo.example.org \
     ${REGISTRY}/denodo/vdp:8.0
 ```
 
@@ -53,8 +52,8 @@ rm -f localhost.* ca.*
 docker run --init -it --rm \
     --name denodo-vdp  \
     -h localhost \
-    -v $(pwd)/keystore.jks:/opt/denodo/conf/keystore.jks \
-    -v $(pwd)/truststore.jks:/opt/denodo/conf/truststore.jks \
+    -v $(pwd)/keystore.jks:/opt/denodo/conf/local_keystore.jks \
+    -v $(pwd)/truststore.jks:/opt/denodo/conf/local_truststore.jks \
     -v $(pwd)/denodo.lic:/opt/denodo/conf/denodo.lic \
     -v denodo-vdp-data:/opt/denodo/metadata/db \
     -p 7998:7998 \
@@ -74,22 +73,41 @@ docker run --init -it --rm \
     -p 9999:9999 \
     -p 10091:10091 \
     -e DENODO_SSL_ENABLED=true \
-    -e DENODO_SSL_KEYSTORE=/opt/denodo/conf/keystore.jks \
+    -e DENODO_SSL_KEYSTORE=/opt/denodo/conf/local_keystore.jks \
     -e DENODO_SSL_KEYSTORE_PASSWORD=changeit \
-    -e DENODO_SSL_TRUSTSTORE=/opt/denodo/conf/truststore.jks \
+    -e DENODO_SSL_TRUSTSTORE=/opt/denodo/conf/local_truststore.jks \
     -e DENODO_SSL_TRUSTSTORE_PASSWORD=changeit \
+    -e DENODO_SSL_KEYSTORE_ALIAS=localhost \
     ${REGISTRY}/denodo/vdp:8.0
 ```
 
 ### Environment Variables
 | Variable Name | Description | Default Value |
 | --- | --- | --- |
-| DENODO_HOSTNAME | This must be set to the external hostname your accessing VDP at. See gotcha below. | localhost |
-| DENODO_SSL_ENABLED | | None |
-| DENODO_SSL_KEYSTORE | | None |
-| DENODO_SSL_KEYSTORE_PASSWORD | | None |
-| DENODO_SSL_TRUSTSTORE | | None |
-| DENODO_SSL_TRUSTSTORE_PASSWORD | | None |
+| DENODO_USE_EXTERNAL_DB | | |
+| DENODO_STORAGE_PLUGIN | | |
+| DENODO_STORAGE_VERSION | | |
+| DENODO_STORAGE_DRIVER | | |
+| DENODO_STORAGE_DRIVER_PROPERTIES | | |
+| DENODO_STORAGE_CLASSPATH | | |
+| DENODO_STORAGE_URI | | |
+| DENODO_STORAGE_USER | | |
+| DENODO_STORAGE_PASSWORD | | |
+| DENODO_STORAGE_CATALOG | | |
+| DENODO_STORAGE_SCHEMA | | |
+| DENODO_STORAGE_INITIAL_SIZE | | 4 |
+| DENODO_STORAGE_MAX_ACTIVE | | 100 |
+| DENODO_STORAGE_PING_QUERY | | select 1 |
+| DENODO_SSL_ENABLED | | |
+| DENODO_SSL_KEYSTORE_PASSWORD | | |
+| DENODO_SSL_TRUSTSTORE_PASSWORD | | |
+| DENODO_SSL_KEYSTORE | | |
+| DENODO_SSL_TRUSTSTORE | | |
+| DENODO_SSL_KEYSTORE_ALIAS | | |
+| DENODO_RMI_HOSTNAME | | localhost |
+| DENODO_VDP_JAVA_OPTS | | -Xmx1024m -XX:NewRatio=4 |
+| DENODO_SM_JAVA_OPTS | | -Xmx1024m |
+| DENODO_WEB_JAVA_OPTS | | -Xmx1024m -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true -Djava.locale.providers=COMPAT,SPI |
 | DENODO_START_VQL_SERVER | | true |
 | DENODO_START_DESIGN_STUDIO | | true |
 | DENODO_START_SCHEDULER | | true |
@@ -97,22 +115,7 @@ docker run --init -it --rm \
 | DENODO_START_INDEXING_SERVER | | true |
 | DENODO_START_DATA_CATALOG | | true |
 | DENODO_START_DIAGNOSTIC_AND_MONITORING | | true |
-| DENODO_USE_EXTERNAL_METADATA | Enables the use of an external database for storage of metadata. | false |
-| DENODO_STORAGE_CATALOG | | |
-| DENODO_STORAGE_DATASOURCE_TESTONBORROW | | true |
-| DENODO_STORAGE_DATASOURCE_MAXACTIVE | | 100 |
-| DENODO_STORAGE_PLUGIN | | postgresql |
-| DENODO_STORAGE_ENCRYPTEDPASSWORD | The Denodo encrypted password. This is currently being generated from DENODO_STORAGE_PASSWORD | |
-| DENODO_STORAGE_PASSWORD | Plain-text password. Will be encrypted by Denodo. | |
-| DENODO_STORAGE_SHAREDMETADATA | | true |
-| DENODO_STORAGE_CLASSPATH | | postgresql-10 |
-| DENODO_STORAGE_URI | | jdbc\:postgresql\://postgres\:5432/denodo |
-| DENODO_STORAGE_DATASOURCE_INITIALSIZE | | 4 |
-| DENODO_STORAGE_DATASOURCE_VALIDATIONQUERY | | Select 1 |
-| DENODO_STORAGE_USER | | denodo |
-| DENODO_STORAGE_DRIVER | | org.postgresql.Driver |
-| DENODO_STORAGE_VERSION | | 10 |
-| DENODO_STORAGE_SCHEMA | | |
+| DENODO_LICENSE_HOSTNAME | | |
 
 ### Virtual DataPort Default Ports
 | Server | Default Port |

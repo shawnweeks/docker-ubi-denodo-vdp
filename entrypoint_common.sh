@@ -107,9 +107,9 @@ configure_external_db() {
         --user "${DENODO_STORAGE_USER}" \
         --password "${DENODO_STORAGE_PASSWORD}" \
         ${DENODO_STORAGE_CATALOG:+--catalog} "${DENODO_STORAGE_CATALOG}" \
-        ${DENODO_STORAGE_CATALOG:+--schema} "${DENODO_STORAGE_SCHEMA}" \
+        ${DENODO_STORAGE_SCHEMA:+--schema} "${DENODO_STORAGE_SCHEMA}" \
         --initialSize  "${DENODO_STORAGE_INITIAL_SIZE:-4}" \
-        --maxActive "${DENODO_STORAGE_INITIAL_SIZE:-100}" \
+        --maxActive "${DENODO_STORAGE_MAX_ACTIVE:-100}" \
         --testConnections \
         --pingQuery "${DENODO_STORAGE_PING_QUERY:-select 1}" \
         --yes
@@ -160,6 +160,18 @@ configure_ssl() {
 #     done
 # }
 
+configure_license() {
+    if [[ -z "$DENODO_LICENSE_HOSTNAME" ]]
+    then
+        return 0
+    fi
+
+    prop_replace \
+        "com.denodo.license.host" \
+        "${DENODO_LICENSE_HOSTNAME}" \
+        ${HOME}/conf/SolutionManager.properties
+}
+
 configure_rmi_hostname() {
     prop_replace \
         "com.denodo.vdb.vdbinterface.server.VDBManagerImpl.registryURL" \
@@ -203,21 +215,21 @@ configure() {
     else
         WEB_CONTAINER_RUNNING='false'
     fi
-
-    #echo "${DENODO_LICENSE}" > /opt/denodo/conf/denodo.lic
     
     entrypoint.py
 
     # This breaks log4j2 so I'll have to wait for a fix from Denodo
     # fix_java_11
 
-    #configure_rmi_hostname
+    configure_rmi_hostname
     
-    #configure_java_opts
+    configure_java_opts
 
-    #configure_ssl
+    configure_ssl
+    
+    configure_license
 
-    #configure_external_db
+    configure_external_db
 
     ${HOME}/bin/regenerateFiles.sh
 }
