@@ -78,13 +78,14 @@ docker run --init -it --rm \
     -e DENODO_SSL_TRUSTSTORE=/opt/denodo/conf/local_truststore.jks \
     -e DENODO_SSL_TRUSTSTORE_PASSWORD=changeit \
     -e DENODO_SSL_KEYSTORE_ALIAS=localhost \
+    -e DENODO_LICENSE_HOSTNAME=denodo-solman \
     ${REGISTRY}/denodo/vdp:8.0
 ```
 
 ### Environment Variables
 | Variable Name | Description | Default Value |
 | --- | --- | --- |
-| DENODO_USE_EXTERNAL_DB | | |
+| DENODO_USE_EXTERNAL_DB | | false |
 | DENODO_STORAGE_PLUGIN | | |
 | DENODO_STORAGE_VERSION | | |
 | DENODO_STORAGE_DRIVER | | |
@@ -115,7 +116,7 @@ docker run --init -it --rm \
 | DENODO_START_INDEXING_SERVER | | true |
 | DENODO_START_DATA_CATALOG | | true |
 | DENODO_START_DIAGNOSTIC_AND_MONITORING | | true |
-| DENODO_LICENSE_HOSTNAME | | |
+| DENODO_LICENSE_HOSTNAME | | The license manager hostname. |
 
 ### Virtual DataPort Default Ports
 | Server | Default Port |
