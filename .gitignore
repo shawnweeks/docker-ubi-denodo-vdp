@@ -1,3 +1,4 @@
 *.lic
 *.zip
 *.jks
+/ignore/

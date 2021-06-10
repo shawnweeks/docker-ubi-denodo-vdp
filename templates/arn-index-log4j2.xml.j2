@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+
+    <Appenders>
+
+        <RollingFile name="FILEOUT" filePattern="{{ HOME }}/logs/arn-index/arn-index-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="com.denodo.arn" level="ERROR" />
+        <Logger name="com.denodo.util.launcher.ServerLauncher" level="ERROR" />
+
+        <Root level="ERROR">
+            <AppenderRef ref="FILEOUT" />
+        </Root>
+
+    </Loggers>
+
+</Configuration>

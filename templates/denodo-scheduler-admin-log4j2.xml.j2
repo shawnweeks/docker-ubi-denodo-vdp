@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration>
+
+    <Appenders>
+
+        <RollingFile name="FILEOUT" filePattern="{{ HOME }}/logs/scheduler/scheduler-admin-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+        
+        <RollingFile name="REQUESTOUT" filePattern="{{ HOME }}/logs/scheduler/scheduler-admin-request-%d{yyyy-MM-dd}.log">
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </RollingFile>
+		
+		<Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%-4r [%t] %-5p %d{yyyy-MM-dd'T'HH:mm:ss.SSS} %c %x - %m  %n" />
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="com.denodo" level="ERROR" />
+
+        <Root level="ERROR">
+            <AppenderRef ref="FILEOUT" />
+			<AppenderRef ref="STDOUT" />
+        </Root>
+
+    </Loggers>
+
+</Configuration>
