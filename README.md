@@ -155,3 +155,10 @@ docker run --init -it --rm \
 
 ### Gotchas
 Something that will trip you up is how Denodo uses it's hostname. Denodo takes advantage of Java RMI(Remote Method Invocation). RMI has a nasty querk that it only will respond if your request came to the hostname it was expecting. To make sure both internal and external communication works to VDP you need to make sure that you set the ```DENODO_HOSTNAME``` and container hostname to the exact same value as your external connection. So if for example Dendodo is behind a load balancer and the URL is ```denodo.example.org``` then both ```DENODO_HOSTNAME``` and the containers hostname must be ```denodo.example.org``` for everything to work the way your expecting.
+
+
+### Deploy to ECS
+```shell
+aws ecs register-task-definition --cli-input-json file://dev_task_def.json
+aws ecs create-service --cli-input-json file://dev_service_def.json
+aws ecs update-service --cli-input-json file://dev_service_upd.json

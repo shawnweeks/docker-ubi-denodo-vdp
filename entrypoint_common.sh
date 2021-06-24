@@ -7,7 +7,7 @@ prop_replace() {
     if ! grep --silent "^[#]*\s*${KEY}=.*" ${FILE} 2>/dev/null; then
         echo "APPENDING '${VALUE}' because '${KEY}' not found in ${FILE}."
         echo "${KEY}=${VALUE}" >> ${FILE}
-    elif ! grep --silent "^${KEY}=${VALUE}" ${FILE} 2>/dev/null; then
+    elif ! grep --silent "^${KEY}=${VALUE}$" ${FILE} 2>/dev/null; then
         echo "UPDATING '${VALUE}' because '${KEY}' was different in ${FILE}."
         sed -i.backup "s~^[#]*\s*${KEY}=.*~${KEY}=${VALUE}~" ${FILE}
     else
@@ -126,28 +126,42 @@ configure_ssl() {
     # Populating Credentials file with Keystore and Truststore Password
     #echo "keystore.password=$(${HOME}/bin/encrypt_password.sh ${DENODO_SSL_KEYSTORE_PASSWORD} | grep -v 'Encrypted Password:' )" > ${HOME}/conf/credentials
     #echo "truststore.password=$(${HOME}/bin/encrypt_password.sh ${DENODO_SSL_TRUSTSTORE_PASSWORD} | grep -v 'Encrypted Password:')" >> ${HOME}/conf/credentials
+    
+    DENODO_SSL_KEYSTORE_PASSWORD=$(openssl rand -base64 16)
+    DENODO_SSL_TRUSTSTORE_PASSWORD=$(openssl rand -base64 16)
 
+    # Changed this to generate a random password each time.
     prop_replace "keystore.password" "$(${HOME}/bin/encrypt_password.sh ${DENODO_SSL_KEYSTORE_PASSWORD} | grep -v 'Encrypted Password:' )" "${HOME}/conf/credentials"
     prop_replace "truststore.password" "$(${HOME}/bin/encrypt_password.sh ${DENODO_SSL_TRUSTSTORE_PASSWORD} | grep -v 'Encrypted Password:' )" "${HOME}/conf/credentials"
     
     # Making local copies so we don't have to modify the external files
-    cp ${DENODO_SSL_KEYSTORE} ${HOME}/conf/keystore.jks
-    cp ${DENODO_SSL_TRUSTSTORE} ${HOME}/conf/truststore.jks
+    # cp ${DENODO_SSL_KEYSTORE} ${HOME}/conf/keystore.jks
+    # cp ${DENODO_SSL_TRUSTSTORE} ${HOME}/conf/truststore.jks
+
+    # Regenerating these each time
+    rm -f ${HOME}/conf/keystore.jks
+    rm -f ${HOME}/conf/truststore.jks
 
     # Because Denodo made some poor descisions we need to extract the cert just to put it back
-    keytool -exportcert -keystore ${DENODO_SSL_KEYSTORE} -storepass ${DENODO_SSL_KEYSTORE_PASSWORD} -alias ${DENODO_SSL_KEYSTORE_ALIAS} -file ${HOME}/conf/cert.cer 2>/dev/null
+    # keytool -exportcert -keystore ${DENODO_SSL_KEYSTORE} -storepass ${DENODO_SSL_KEYSTORE_PASSWORD} -alias ${DENODO_SSL_KEYSTORE_ALIAS} -file ${HOME}/conf/cert.cer 2>/dev/null
+
+    echo "${DENODO_SSL_CERT}" > ${HOME}/conf/denodo.cer
+    echo "${DENODO_SSL_KEY}" > ${HOME}/conf/denodo.key
+
+    # Really hate this nonsense Denodo
+    keytool -importcert -file ${HOME}/conf/denodo.cer -storepass ${DENODO_SSL_TRUSTSTORE_PASSWORD} -keystore ${HOME}/conf/truststore.jks -noprompt
 
     # Running Denodo SSL Configuration Script
     ${HOME}/bin/denodo_tls_configurator.sh \
         --denodo-home ${HOME} \
         --keystore ${HOME}/conf/keystore.jks \
         --truststore ${HOME}/conf/truststore.jks \
-        --cert-cer-file ${HOME}/conf/cert.cer \
-        --credentials-file ${HOME}/conf/credentials \
-        --license-manager-uses-tls=true
+        --key-pem-file ${HOME}/conf/denodo.key \
+        --cert-pem-file ${HOME}/conf/denodo.cer \
+        --credentials-file ${HOME}/conf/credentials
     
     # Cleanup Files    
-    rm ${HOME}/conf/cert.cer ${HOME}/conf/credentials
+    # rm ${HOME}/conf/cert.cer ${HOME}/conf/credentials
 }
 
 # This breaks log4j2 so I'll have to wait for a fix from Denodo
@@ -170,6 +184,16 @@ configure_license() {
         "com.denodo.license.host" \
         "${DENODO_LICENSE_HOSTNAME}" \
         ${HOME}/conf/SolutionManager.properties
+
+    prop_replace \
+        "com.denodo.license.port" \
+        "${DENODO_LICENSE_PORT}" \
+        ${HOME}/conf/SolutionManager.properties
+
+    prop_replace \
+        "com.denodo.license.security.ssl.enabled" \
+        "${DENODO_LICENSE_HOSTNAME_SSL}" \
+        ${HOME}/conf/SolutionManager.properties        
 }
 
 configure_rmi_hostname() {
@@ -201,6 +225,28 @@ configure_java_opts() {
         ${HOME}/resources/apache-tomcat/conf/tomcat.properties
 }
 
+configure_sso() {
+    if [[ -z "$DENODO_SSO_ENABLED" ]]
+    then
+        return 0
+    fi
+
+    prop_replace \
+        "sso.url" \
+        "${DENODO_SSO_URL}" \
+        ${HOME}/conf/SSOConfiguration.properties
+
+    prop_replace \
+        "sso.token-enabled" \
+        "${DENODO_SSO_TOKEN_ENABLED}" \
+        ${HOME}/conf/SSOConfiguration.properties
+
+    prop_replace \
+        "sso.enabled" \
+        "${DENODO_SSO_ENABLED}" \
+        ${HOME}/conf/SSOConfiguration.properties
+}
+
 configure() {
     START_VQL_SERVER="${DENODO_START_VQL_SERVER:-true}"
     START_DESIGN_STUDIO="${DENODO_START_DESIGN_STUDIO:-true}"
@@ -228,6 +274,8 @@ configure() {
     configure_ssl
     
     configure_license
+
+    configure_sso
 
     configure_external_db
 
